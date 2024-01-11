@@ -63,6 +63,7 @@ This code example demonstrates how to communicate as host and client using the S
 1. Download the ZIP file containing the source code and extract it.
 2. Connect the Serial Data Out (SDO), Serial Data In (SDI) Serial Clock (SCK), Chip Select 1 (CS1) and Ground (GND) pins of two Curiosity Nano Boards to each other.
    For this demonstration with PIC18F56Q71 th pin-outs are as follows:
+   
    | Pin Function | Hardware Pin |
    | ------------ | ------------ |
    | SDO          | RC2          |
