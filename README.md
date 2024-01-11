@@ -20,8 +20,8 @@ This code example demonstrates how to communicate as host and client using the S
 - [MPLAB® Code Configurator (MCC) v5.4.1 or newer](https://www.microchip.com/en-us/tools-resources/configure/mplab-code-configurator)
 
 ## Hardware Used
-- [PIC18F56Q71 Curiosity Nano DM182029](https://www.microchip.com/en-us/development-tool/EV01G21A)
-- [Curiosity Nano Base for Click boards™ AC164162)](https://www.microchip.com/Developmenttools/ProductDetails/AC164162)
+- [PIC18F56Q71 Curiosity Nano](https://www.microchip.com/en-us/development-tool/EV01G21A)
+- [Curiosity Nano Base for Click boards™](https://www.microchip.com/Developmenttools/ProductDetails/AC164162)
 - [7Seg Click board™](https://www.mikroe.com/7seg-click)
 
 ## [SPI Host Demonstration](#spi-host)
