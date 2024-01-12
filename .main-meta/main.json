@@ -4,8 +4,8 @@
     "content": {
         "metaDataVersion": "1.3.0",
         "name": "com.microchip.mcu8.mplabx.project.pic18f56q71-cnano-spi-driver-mplab-mcc",
-        "version": " ",
-        "displayName": "",
+        "version": "1.0.0",
+        "displayName": "SPI Driver using the PIC18F56Q71 Microcontroller and MCC Melody",
         "projectName": "pic18f56q71-cnano-spi-driver-mplab-mcc",
         "shortDescription": "This code example demonstrates how to communicate as host and client using SPI protocol in interrupt and polling mode on PIC18F56Q71 with MPLAB MCC Melody.",
         "ide": {
