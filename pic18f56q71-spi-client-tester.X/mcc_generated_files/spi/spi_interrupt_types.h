@@ -5,7 +5,7 @@
  *
  * @defgroup spi SPI
  *
- * @version SPI Driver Version v3.0.0.
+ * @version SPI Driver Version v3.1.0.
  *
  * @brief This header file provides type definitions for the SPI module operation in Interrupt mode.
  *

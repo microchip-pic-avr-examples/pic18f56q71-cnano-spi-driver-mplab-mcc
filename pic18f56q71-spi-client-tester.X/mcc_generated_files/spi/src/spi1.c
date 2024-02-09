@@ -7,7 +7,7 @@
   *
   * @brief This file contains the driver code for the SPI1 module.
   *
-  * @version SPI1 Driver Version v3.0.0.
+  * @version SPI1 Driver Version v3.1.0.
 */
 
 /*
@@ -148,8 +148,9 @@ void SPI1_Close(void)
 void SPI1_BufferExchange(void *bufferData, size_t bufferSize)
 {
 	uint8_t* bufferInput = bufferData;
+
 	if (SPI_IDLE == spi1_descriptor.status)
-    	{
+    {
 		//Set both SPI as full duplex mode for buffer exchange operation
         SPI1CON2 = (SPI1CON2 | _SPI1CON2_SPI1RXR_MASK) | _SPI1CON2_SPI1TXR_MASK;
 		
@@ -163,7 +164,9 @@ void SPI1_BufferExchange(void *bufferData, size_t bufferSize)
 		//Clear the buffers
         SPI1STATUSbits.CLRBF = 1U;
         //Load the transfer count register
-		SPI1TCNTL = (uint8_t)((uint8_t)0xFF & (uint8_t)bufferSize);
+		SPI1TCNTH = (uint8_t)(bufferSize>>8);
+		SPI1TCNTL = (uint8_t)(bufferSize);
+		
 		//Set the interrupts
 		PIE3bits.SPI1RXIE 	= 1U;
 		PIE3bits.SPI1TXIE 	= 1U;
@@ -177,10 +180,11 @@ void SPI1_BufferExchange(void *bufferData, size_t bufferSize)
 void SPI1_BufferWrite(void *bufferData, size_t bufferSize)
 {
 	uint8_t* bufferInput = bufferData;
+
 	if (SPI_IDLE == spi1_descriptor.status)
-    	{
+    {
 		//Set both SPI as transmit only mode for buffer write operation
-        	SPI1CON2 = (SPI1CON2 & ~_SPI1CON2_SPI1RXR_MASK) | _SPI1CON2_SPI1TXR_MASK;
+        SPI1CON2 = (SPI1CON2 & ~_SPI1CON2_SPI1RXR_MASK) | _SPI1CON2_SPI1TXR_MASK;
 		//Load the spi1_descriptor
 		spi1_descriptor.transmitBuffer 	= bufferInput;
 		spi1_descriptor.receiveBuffer 	= NULL;
@@ -191,7 +195,9 @@ void SPI1_BufferWrite(void *bufferData, size_t bufferSize)
 		//Clear the buffers
 		SPI1STATUSbits.CLRBF = 1U;
         //Load the transfer count register
-		SPI1TCNTL = bufferSize;
+		SPI1TCNTH = (uint8_t)(bufferSize>>8);
+		SPI1TCNTL = (uint8_t)(bufferSize);
+
 		//Set the interrupts
 		PIE3bits.SPI1TXIE 	= 1U;
 	}
@@ -204,6 +210,7 @@ void SPI1_BufferWrite(void *bufferData, size_t bufferSize)
 void SPI1_BufferRead(void *bufferData, size_t bufferSize)
 {
 	uint8_t* bufferInput = bufferData;
+
 	if (SPI_IDLE == spi1_descriptor.status)
     {
 		//Set both SPI as receive only mode for buffer read operation
@@ -219,7 +226,9 @@ void SPI1_BufferRead(void *bufferData, size_t bufferSize)
 		//Clear the buffers
 		SPI1STATUSbits.CLRBF = 1U;
          //Load the transfer count register
-		SPI1TCNTL = bufferSize;
+		SPI1TCNTH = (uint8_t)(bufferSize>>8);
+		SPI1TCNTL = (uint8_t)(bufferSize);
+
 		//Set the interrupts
 		PIE3bits.SPI1RXIE 	= 1U;
 	}
@@ -296,39 +305,39 @@ uint8_t SPI1_ByteRead(void)
 bool SPI1_IsTxReady(void)
 {
 	bool returnValue = false;
-    	if (SPI_IDLE == spi1_descriptor.status)
-    	{
-        	returnValue = true;
-    	}
-    	else 
-    	{
-        	returnValue = false;
-    	}
-    	return returnValue;
+    if (SPI_IDLE == spi1_descriptor.status)
+    {
+        returnValue = true;
+    }
+    else 
+    {
+        returnValue = false;
+    }
+    return returnValue;
 }
 
 bool SPI1_IsRxReady(void)
 {
 	bool returnValue = false;
-    	if((spi1_descriptor.status == SPI_IDLE) && (1U == PIR3bits.SPI1RXIF))
-    	{
-        	returnValue = true;
-    	}
-    	else 
-    	{
-        	returnValue = false;
-    	}
-    	return returnValue;
+    if((spi1_descriptor.status == SPI_IDLE) && (1U == PIR3bits.SPI1RXIF))
+    {
+        returnValue = true;
+    }
+    else 
+    {
+        returnValue = false;
+    }
+    return returnValue;
 }
 
 void SPI1_RxCompleteCallbackRegister(void (*rxCompleteCallbackHandler)(void))
 {
-	 SPI1_RxCompleteCallback = rxCompleteCallbackHandler;
+	SPI1_RxCompleteCallback = rxCompleteCallbackHandler;
 }
 
 void SPI1_TxCompleteCallbackRegister(void (*txCompleteCallbackHandler)(void))
 {
-	 SPI1_TxCompleteCallback = txCompleteCallbackHandler;
+	SPI1_TxCompleteCallback = txCompleteCallbackHandler;
 }
 
 void SPI1_Receive_ISR(void)
@@ -349,19 +358,19 @@ void SPI1_Receive_ISR(void)
 	if((size_t)0 == spi1_descriptor.bytesToReceive)
 	{
         //If no more bytes to receive disable the interrupts
-			PIE3bits.SPI1RXIE 	= 0U;
+		PIE3bits.SPI1RXIE 	= 0U;
         //Check to see if more bytes are there to transmit
         //In case of Buffer Read there wont be any bytes to transmit
         //It should set it the status to SPI_IDLE
         if((size_t)0 == spi1_descriptor.bytesToTransmit)
         {
-	    spi1_descriptor.status = SPI_IDLE;	
+	    	spi1_descriptor.status = SPI_IDLE;	
     	}
-	else
-	{
-		//Do nothing
-	}
-	if (SPI1_RxCompleteCallback != NULL)
+		else
+		{
+			//Do nothing
+		}
+		if (SPI1_RxCompleteCallback != NULL)
         {
         	SPI1_RxCompleteCallback();
         }
@@ -400,21 +409,21 @@ void SPI1_Transmit_ISR(void)
         //In case of Buffer Write there wont be any bytes to receive
         //It should set it the status to SPI_IDLE
         if((size_t)0 == spi1_descriptor.bytesToReceive)
-	{
+		{
 			spi1_descriptor.status = SPI_IDLE;
-	}
-	else
-	{
-		//Do nothing
-	}
-	if (SPI1_TxCompleteCallback != NULL)
-        {
+		}
+		else
+		{
+			//Do nothing
+		}
+		if (SPI1_TxCompleteCallback != NULL)
+    	{
         	SPI1_TxCompleteCallback();
-        }
-        else
-        {
+    	}
+    	else
+    	{
         	// No callback exists
-        }
+    	}
 	}
 }
 

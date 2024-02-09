@@ -7,7 +7,7 @@
  *
  * @brief This header file provides API prototypes for the SPI1 driver.
  *
- * @version SPI1 Driver Version v3.0.0.
+ * @version SPI1 Driver Version v3.1.0.
  *
 */
 

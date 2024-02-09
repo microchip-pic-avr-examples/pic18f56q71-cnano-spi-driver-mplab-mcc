@@ -10,21 +10,21 @@
         "shortDescription": "This code example demonstrates how to communicate as host and client using SPI protocol in interrupt and polling mode on PIC18F56Q71 with MPLAB MCC Melody.",
         "ide": {
             "name": "MPLAB X",
-            "semverRange": ">=6.15.0"
+            "semverRange": ">=6.20.0"
         },
         "compiler": [
             {
                 "name": "XC8",
-                "semverRange": "^2.45.0"
+                "semverRange": "^2.46.0"
             }
         ],
         "dfp": {
             "name": "PIC18F-Q_DFP",
-            "semverRange": "^1.20.405"
+            "semverRange": "^1.24.430"
         },
         "configurator": {
             "name": "MCC",
-            "semverRange": "^5.4.1"
+            "semverRange": "^5.5.0"
         },
         "device": {
             "metaDataVersion": "1.0.0",

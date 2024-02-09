@@ -15,9 +15,9 @@ This code example demonstrates how to communicate as host and client using the S
 - [PIC18F-Q71 Family Product Page](https://www.microchip.com/en-us/products/microcontrollers-and-microprocessors/8-bit-mcus/pic-mcus/pic18-q71)
 
 ## Software Used
-- [MPLAB® X IDE v6.15 or newer](http://www.microchip.com/mplab/mplab-x-ide)
+- [MPLAB® X IDE v6.20 or newer](http://www.microchip.com/mplab/mplab-x-ide)
 - [MPLAB® XC8 Compiler v2.46 or newer](https://www.microchip.com/en-us/tools-resources/develop/mplab-xc-compilers/xc8)
-- [MPLAB® Code Configurator (MCC) v5.4.1 or newer](https://www.microchip.com/en-us/tools-resources/configure/mplab-code-configurator)
+- [MPLAB® Code Configurator (MCC) v5.5.0 or newer](https://www.microchip.com/en-us/tools-resources/configure/mplab-code-configurator)
 
 ## Hardware Used
 - [PIC18F56Q71 Curiosity Nano](https://www.microchip.com/en-us/development-tool/EV01G21A)

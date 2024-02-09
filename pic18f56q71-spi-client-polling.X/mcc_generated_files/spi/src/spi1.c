@@ -7,7 +7,7 @@
   *
   * @brief This file contains the driver code for the SPI1 module.
   *
-  * @version SPI1 Driver Version v3.0.0.
+  * @version SPI1 Driver Version v3.1.0.
 */
 
 /*
@@ -95,7 +95,7 @@ bool SPI1_Open(uint8_t spiConfigIndex)
         SPI1CON2 = spi1_configuration[spiConfigIndex].con2 & ~(_SPI1CON2_SPI1RXR_MASK) & ~(_SPI1CON2_SPI1TXR_MASK);
         SPI1BAUD = spi1_configuration[spiConfigIndex].baud;        
         SPI1CLK = spi1_configuration[spiConfigIndex].clksel;        
-	TRISCbits.TRISC6 = 1;
+		TRISCbits.TRISC6 = 1;
         SPI1CON0bits.EN = 1U;
 		
 		returnValue = true;
@@ -115,72 +115,80 @@ void SPI1_Close(void)
 void SPI1_BufferExchange(void *bufferData, size_t bufferSize)
 {
 	uint8_t* bufferInput = bufferData;
-	size_t bufferInputSize = bufferSize;
+
+	//Load the transfer count register
+	SPI1TCNTH = (uint8_t)(bufferSize>>8);
+	SPI1TCNTL = (uint8_t)(bufferSize);	
 	
 	//Set both SPI as full duplex mode for buffer exchange operation
-       	SPI1CON2 = ((SPI1CON2) | (_SPI1CON2_SPI1RXR_MASK) | (_SPI1CON2_SPI1TXR_MASK));
+    SPI1CON2 = ((SPI1CON2) | (_SPI1CON2_SPI1RXR_MASK) | (_SPI1CON2_SPI1TXR_MASK));
 	
-	while((size_t)0 != bufferInputSize)
+	while(0U == SPI1INTFbits.TCZIF)
 	{
-		SPI1TCNTL = 1;	
 		//Write input data to SPI transmit buffer register
 		SPI1TXB = *bufferInput;
-		//Wait on status of transmit
 		while(!PIR3bits.SPI1RXIF)
 		{
-            		//Wait on receive interrupt flag to be set
-        	};
-		
+			//Wait on receive interrupt flag to be set
+        };
 		
 		//Store received data  from receive buffer register 
 		*bufferInput = SPI1RXB;		
 		bufferInput++;
-		bufferInputSize = bufferInputSize - 1U;
-	}	
+	}
+	//Clear the TCZIF interrupt flag
+	SPI1INTFbits.TCZIF = 0U;
 }
 
 void SPI1_BufferWrite(void *bufferData, size_t bufferSize)
 {
 	uint8_t* bufferInput = bufferData;
-	size_t bufferInputSize = bufferSize;
-	
+
+	//Load the transfer count register
+	SPI1TCNTH = (uint8_t)(bufferSize>>8);
+	SPI1TCNTL = (uint8_t)(bufferSize);
+
 	//Set both SPI as transmit only mode for buffer write operation
-        SPI1CON2 = SPI1CON2 & ~(_SPI1CON2_SPI1RXR_MASK) | (_SPI1CON2_SPI1TXR_MASK);
+    SPI1CON2 = (SPI1CON2 & ~(_SPI1CON2_SPI1RXR_MASK)) | (_SPI1CON2_SPI1TXR_MASK);
    
-	while((size_t)0 != bufferInputSize)
+	while(0U == SPI1INTFbits.TCZIF)
 	{
-		SPI1TCNTL = 1;
 		//Write input data to SPI transmit buffer register
 		SPI1TXB = *bufferInput;
+		while(!PIR3bits.SPI1TXIF)
+		{
+			//Wait on transmit interrupt flag to be set
+        };
 		bufferInput++;
-		bufferInputSize = bufferInputSize - 1U;
 	}	
-	
+	//Clear the TCZIF interrupt flag
+	SPI1INTFbits.TCZIF = 0U;
 }
 
 void SPI1_BufferRead(void *bufferData, size_t bufferSize)
 {
 	uint8_t* bufferInput = bufferData;
-	size_t bufferInputSize = bufferSize;
 	
+	//Load the transfer count register
+	SPI1TCNTH = (uint8_t)(bufferSize>>8);
+	SPI1TCNTL = (uint8_t)(bufferSize);
+
 	//Set both SPI as receive only mode for buffer read operation
-    SPI1CON2 = ((SPI1CON2) | (_SPI1CON2_SPI1RXR_MASK) & ~(_SPI1CON2_SPI1TXR_MASK));
-	while((size_t)0 != bufferInputSize)
+    SPI1CON2 = (SPI1CON2 | (_SPI1CON2_SPI1RXR_MASK)) & ~(_SPI1CON2_SPI1TXR_MASK);
+	while(0U == SPI1INTFbits.TCZIF)
 	{
-		SPI1TCNTL = 1;
 		//Write dummy data to SPI transmit buffer register
 		SPI1TXB = 0x00U;
-		//Wait on status of transmit
 		while(!PIR3bits.SPI1RXIF)
 		{
-            		//Wait on receive interrupt flag to be set
-        	};
+            //Wait on receive interrupt flag to be set
+        };
 		//Store received data  from receive buffer register 
 		*bufferInput = SPI1RXB;
-		
 		bufferInput++;
-		bufferInputSize = bufferInputSize - 1U;
-	}	
+	}
+	//Clear the TCZIF interrupt flag
+	SPI1INTFbits.TCZIF = 0U;
 }
 
 uint8_t SPI1_ByteExchange(uint8_t byteData)
@@ -192,8 +200,8 @@ uint8_t SPI1_ByteExchange(uint8_t byteData)
 	SPI1TXB = byteData;
 	while(!PIR3bits.SPI1RXIF)
 	{
-            //Wait on receive interrupt flag to be set
-        };	
+		//Wait on receive interrupt flag to be set
+    };	
 	
 	//Store received data  from receive buffer register 
 	returnValue = SPI1RXB;
@@ -239,12 +247,12 @@ bool SPI1_IsRxReady(void)
 	bool returnValue = false;
 	
 	if(true == SPI1CON0bits.EN)
-    	{
+    {
 		returnValue = PIR3bits.SPI1RXIF;
-    	}
-    	else 
-    	{
-        	returnValue = false;
-    	}
-    	return returnValue;
+    }
+    else 
+    {
+        returnValue = false;
+    }
+    return returnValue;
 }

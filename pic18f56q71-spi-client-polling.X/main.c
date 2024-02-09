@@ -66,7 +66,6 @@ int main(void)
 
     SPI_Client.Initialize();
     SPI_Client.Open(CLIENT_CONFIG);
-    //    printf("\t...Working...\n");
     printf("\e[1;1H\e[2J"); // Clear Screen
 
     while (1)
